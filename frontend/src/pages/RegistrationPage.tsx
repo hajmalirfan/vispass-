@@ -2,9 +2,9 @@ import { useState } from 'react';
 import type { FC, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building, Mail, Lock, Eye, EyeOff, Shield, Loader2, ArrowLeft } from 'lucide-react';
+import { User, Building, Mail, Lock, Eye, EyeOff, Shield, Loader2, ArrowLeft, CheckSquare } from 'lucide-react';
 
-type Role = 'Visitor' | 'Host';
+type Role = 'Visitor' | 'Host' | 'Checker';
 
 export const RegistrationPage: FC = () => {
   const navigate = useNavigate();
@@ -114,30 +114,42 @@ export const RegistrationPage: FC = () => {
           {/* Role Selection */}
           <div className="space-y-3">
             <label className="text-sm font-semibold text-gray-700">Account Type</label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setRole('Visitor')}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
                   role === 'Visitor' 
-                    ? 'border-blue-500 bg-blue-50/50 text-blue-600 shadow-sm' 
-                    : 'border-gray-200 hover:border-blue-300 text-gray-500 hover:bg-gray-50/50'
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    : 'border-gray-200 hover:border-green-300 text-gray-500 hover:bg-gray-50'
                 }`}
               >
-                <User className="w-6 h-6 mb-2" />
-                <span className="font-medium">Visitor</span>
+                <User className="w-5 h-5 mb-1.5" />
+                <span className="text-xs font-semibold">Visitor</span>
               </button>
               <button
                 type="button"
                 onClick={() => setRole('Host')}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
                   role === 'Host' 
-                    ? 'border-blue-500 bg-blue-50/50 text-blue-600 shadow-sm' 
-                    : 'border-gray-200 hover:border-blue-300 text-gray-500 hover:bg-gray-50/50'
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    : 'border-gray-200 hover:border-green-300 text-gray-500 hover:bg-gray-50'
                 }`}
               >
-                <Building className="w-6 h-6 mb-2" />
-                <span className="font-medium">Host</span>
+                <Building className="w-5 h-5 mb-1.5" />
+                <span className="text-xs font-semibold">Host</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('Checker')}
+                className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
+                  role === 'Checker' 
+                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
+                    : 'border-gray-200 hover:border-green-300 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                <CheckSquare className="w-5 h-5 mb-1.5" />
+                <span className="text-xs font-semibold">Checker</span>
               </button>
             </div>
           </div>
