@@ -1,10 +1,17 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import users
+from fastapi.staticfiles import StaticFiles
+from app.api import checker, events, profile, registrations, reports, users
+from app.config import UPLOAD_DIR
 from app.database.core import engine, Base
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+
+# Ensure uploads directory exists before mounting static files
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = FastAPI(title="Visitor Gate Pass API")
 
@@ -23,6 +30,14 @@ app.add_middleware(
 )
 
 app.include_router(users.router, prefix="/users", tags=["users"])
+app.include_router(events.router, prefix="/events", tags=["events"])
+app.include_router(registrations.router, prefix="/api", tags=["registrations"])
+app.include_router(reports.router, prefix="/reports", tags=["reports"])
+app.include_router(profile.router, prefix="/users", tags=["profile"])
+app.include_router(checker.router, prefix="/api/checker", tags=["checker"])
+
+# Serve uploaded ID proof files
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 @app.get("/")
 def read_root():

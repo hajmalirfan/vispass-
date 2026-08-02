@@ -63,8 +63,8 @@ export const LoginPage: FC = () => {
 
   const roles: { value: Role; label: string; icon: any; color: string; desc: string }[] = [
     { value: 'Visitor', label: 'Visitor', icon: User, color: 'text-blue-600', desc: 'Access & pass requests' },
-    { value: 'Host', label: 'Host', icon: Building2, color: 'text-emerald-600', desc: 'Manage visitors & passes' },
-    { value: 'Checker', label: 'Checker', icon: BadgeCheck, color: 'text-amber-600', desc: 'Verify at gate points' },
+    { value: 'Host', label: 'Host', icon: Building2, color: 'text-blue-600', desc: 'Manage visitors & passes' },
+    { value: 'Checker', label: 'Checker', icon: BadgeCheck, color: 'text-blue-600', desc: 'Verify at gate points' },
   ];
 
   const selectedRole = roles.find(r => r.value === role);

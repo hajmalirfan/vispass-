@@ -52,8 +52,7 @@ export const RegistrationPage: FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden"
-         style={{ background: 'linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%)' }}>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
       
       {/* Decorative Background Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
@@ -120,8 +119,8 @@ export const RegistrationPage: FC = () => {
                 onClick={() => setRole('Visitor')}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
                   role === 'Visitor' 
-                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
-                    : 'border-gray-200 hover:border-green-300 text-gray-500 hover:bg-gray-50'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-sm' 
+                    : 'border-gray-200 hover:border-blue-300 text-gray-500 hover:bg-gray-50'
                 }`}
               >
                 <User className="w-5 h-5 mb-1.5" />
@@ -132,8 +131,8 @@ export const RegistrationPage: FC = () => {
                 onClick={() => setRole('Host')}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
                   role === 'Host' 
-                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
-                    : 'border-gray-200 hover:border-green-300 text-gray-500 hover:bg-gray-50'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-sm' 
+                    : 'border-gray-200 hover:border-blue-300 text-gray-500 hover:bg-gray-50'
                 }`}
               >
                 <Building className="w-5 h-5 mb-1.5" />
@@ -144,8 +143,8 @@ export const RegistrationPage: FC = () => {
                 onClick={() => setRole('Checker')}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 ${
                   role === 'Checker' 
-                    ? 'border-green-500 bg-green-50 text-green-600 shadow-sm' 
-                    : 'border-gray-200 hover:border-green-300 text-gray-500 hover:bg-gray-50'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-sm' 
+                    : 'border-gray-200 hover:border-blue-300 text-gray-500 hover:bg-gray-50'
                 }`}
               >
                 <CheckSquare className="w-5 h-5 mb-1.5" />
@@ -204,7 +203,7 @@ export const RegistrationPage: FC = () => {
             whileTap={{ scale: 0.99 }}
             type="submit"
             disabled={isRegistering}
-            className="w-full bg-[#22C55E] hover:bg-green-600 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-green-500/30 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isRegistering ? (
               <>
