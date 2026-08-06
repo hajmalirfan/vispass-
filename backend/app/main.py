@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api import checker, events, profile, registrations, reports, users
-from app.config import UPLOAD_DIR
+from app.core.config import UPLOAD_DIR
 from app.database.core import engine, Base
 
 # Create database tables

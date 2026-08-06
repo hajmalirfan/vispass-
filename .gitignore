@@ -20,6 +20,9 @@ env/
 *.sqlite
 *.sqlite3
 
+# Uploaded files (runtime artifacts)
+uploads/
+
 # Distribution / packaging
 dist/
 build/
