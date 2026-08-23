@@ -1,12 +1,12 @@
 
 
-# 🛡️ Visitor Entry & Gate Pass Management System
+# Visitor Entry & Gate Pass Management System
 
 A secure, role-based web application that digitizes visitor registration, event approvals, QR code gate passes, and entry verification. The system enables **Hosts** to create events, **Visitors** to register for events, **Checkers (Security)** to verify visitors using QR codes, and **Administrators** to manage the entire platform.
 
 ---
 
-# 📖 Table of Contents
+#  Table of Contents
 
 * Project Overview
 * Features
@@ -25,7 +25,7 @@ A secure, role-based web application that digitizes visitor registration, event 
 
 ---
 
-# 📌 Project Overview
+#  Project Overview
 
 Traditional visitor management relies on paper registers and manual verification, leading to long queues, inaccurate records, and security risks.
 
@@ -33,7 +33,7 @@ This application provides a digital solution by allowing event hosts to manage v
 
 ---
 
-# ✨ Features
+#  Features
 
 ## Authentication
 
