@@ -93,7 +93,7 @@ This application provides a digital solution by allowing event hosts to manage v
 
 ---
 
-# 🔄 System Workflow
+#  System Workflow
 
 ```text
 Host Creates Event
@@ -132,7 +132,7 @@ Attendance Recorded
 
 ---
 
-# 👥 User Roles
+#  User Roles
 
 ## Administrator
 
@@ -174,7 +174,7 @@ Attendance Recorded
 
 ---
 
-# 🛠 Technology Stack
+#  Technology Stack
 
 ## Frontend
 
@@ -204,7 +204,7 @@ Attendance Recorded
 
 ---
 
-# 📂 Project Structure
+#  Project Structure
 
 ```
 visitor-gate-pass-system/
@@ -235,7 +235,7 @@ visitor-gate-pass-system/
 
 ---
 
-# ⚙️ Installation
+#  Installation
 
 ## Clone the Repository
 
