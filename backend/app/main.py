@@ -6,6 +6,8 @@ from fastapi.staticfiles import StaticFiles
 from app.api import checker, events, profile, registrations, reports, users
 from app.core.config import UPLOAD_DIR
 from app.database.core import engine, Base
+# Import models so all 5 tables are registered on Base before create_all.
+import app.models  # noqa: F401
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
