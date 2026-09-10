@@ -77,11 +77,14 @@ def update_event(
 
 
 def delete_event(db: Session, current_user: User, event_id: int) -> None:
-    """Delete an event (host owner only)."""
+    """Delete an event (host owner only).
+
+    Registrations + gate passes cascade via FK ON DELETE CASCADE on
+    Postgres; the ORM relationship cascade covers SQLite fallback too.
+    """
     event = get_event(db, event_id)
     if event.host_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only delete your own events")
 
-    db.query(EventRegistration).filter(EventRegistration.event_id == event_id).delete()
     db.delete(event)
     db.commit()

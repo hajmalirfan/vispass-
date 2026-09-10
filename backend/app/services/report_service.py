@@ -2,12 +2,19 @@ import csv
 from io import StringIO
 
 from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.event import Event
 from app.models.registration import EventRegistration
 from app.models.user import User
 from app.schemas.report import EventReport, ReportsSummary
+
+
+def _pass_state(reg: EventRegistration) -> tuple[bool, bool]:
+    gp = reg.gate_pass
+    if not gp:
+        return False, False
+    return bool(gp.checked_in), bool(gp.checked_out)
 
 
 def reports_summary(db: Session, current_user: User) -> ReportsSummary:
@@ -19,7 +26,12 @@ def reports_summary(db: Session, current_user: User) -> ReportsSummary:
     per_event: list[EventReport] = []
 
     for event in events:
-        regs = db.query(EventRegistration).filter(EventRegistration.event_id == event.id).all()
+        regs = (
+            db.query(EventRegistration)
+            .options(joinedload(EventRegistration.gate_pass))
+            .filter(EventRegistration.event_id == event.id)
+            .all()
+        )
         counts = {"total": 0, "pending": 0, "accepted": 0, "rejected": 0, "checked_in": 0}
         for reg in regs:
             counts["total"] += 1
@@ -27,7 +39,8 @@ def reports_summary(db: Session, current_user: User) -> ReportsSummary:
                 counts["pending"] += 1
             elif reg.status == "accepted":
                 counts["accepted"] += 1
-                if reg.checked_in:
+                checked_in, _ = _pass_state(reg)
+                if checked_in:
                     counts["checked_in"] += 1
             elif reg.status == "rejected":
                 counts["rejected"] += 1
@@ -62,7 +75,11 @@ def reports_export(db: Session, current_user: User) -> StreamingResponse:
     """Download a CSV report of every registration for the host's events."""
     event_ids = [e.id for e in db.query(Event).filter(Event.host_id == current_user.id).all()]
     regs = (
-        db.query(EventRegistration).filter(EventRegistration.event_id.in_(event_ids)).order_by(EventRegistration.created_at.desc()).all()
+        db.query(EventRegistration)
+        .options(joinedload(EventRegistration.gate_pass))
+        .filter(EventRegistration.event_id.in_(event_ids))
+        .order_by(EventRegistration.created_at.desc())
+        .all()
         if event_ids
         else []
     )
@@ -87,6 +104,7 @@ def reports_export(db: Session, current_user: User) -> StreamingResponse:
         ]
     )
     for reg in regs:
+        checked_in, checked_out = _pass_state(reg)
         writer.writerow(
             [
                 reg.id,
@@ -97,8 +115,8 @@ def reports_export(db: Session, current_user: User) -> StreamingResponse:
                 reg.organization,
                 reg.purpose,
                 reg.status,
-                "Yes" if reg.checked_in else "No",
-                "Yes" if reg.checked_out else "No",
+                "Yes" if checked_in else "No",
+                "Yes" if checked_out else "No",
                 reg.created_at,
             ]
         )
