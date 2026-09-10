@@ -1,5 +1,12 @@
 """Reset the database with clean demo data and known demo logins.
 
+5-table Postgres layout:
+  1. users
+  2. events
+  3. visitor_profiles
+  4. event_registrations
+  5. gate_passes (QR + entry log)
+
 Usage:
     cd backend
     python seed.py
@@ -9,10 +16,11 @@ from datetime import date, datetime
 
 from app.core.security import get_password_hash
 from app.database.core import Base, SessionLocal, engine
-from app.models.event import Event
-from app.models.profile import VisitorProfile
-from app.models.registration import EventRegistration
-from app.models.user import User
+from app.models.event import Event  # noqa: F401
+from app.models.gate_pass import GatePass  # noqa: F401
+from app.models.profile import VisitorProfile  # noqa: F401
+from app.models.registration import EventRegistration  # noqa: F401
+from app.models.user import User  # noqa: F401
 
 DEMO_PASSWORD = "password123"
 
@@ -77,9 +85,6 @@ def seed() -> None:
             organization="Acme Corporation",
             purpose="Attend keynote sessions",
             status="accepted",
-            qr_code=f"VGP-{secrets.token_urlsafe(16)}",
-            checked_in=False,
-            checked_out=False,
             created_at=datetime.utcnow(),
             decided_at=datetime.utcnow(),
         )
@@ -93,17 +98,26 @@ def seed() -> None:
             organization="Acme Corporation",
             purpose="Member representation",
             status="pending",
-            checked_in=False,
-            checked_out=False,
             created_at=datetime.utcnow(),
         )
 
         db.add_all([accepted, pending])
+        db.flush()
+
+        # Table 5/5: exactly one gate pass for the accepted registration.
+        db.add(
+            GatePass(
+                registration_id=accepted.id,
+                qr_code=f"VGP-{secrets.token_urlsafe(16)}",
+                checked_in=False,
+                checked_out=False,
+            )
+        )
         db.commit()
     finally:
         db.close()
 
-    print(f"Database reset complete.")
+    print("Database reset complete (5 tables).")
     print(f"Host:    {HOST_EMAIL} / {DEMO_PASSWORD}")
     print(f"Visitor: {VISITOR_EMAIL} / {DEMO_PASSWORD}")
     print(f"Checker: {CHECKER_EMAIL} / {DEMO_PASSWORD}")
