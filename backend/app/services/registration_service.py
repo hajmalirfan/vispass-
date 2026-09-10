@@ -7,12 +7,13 @@ from io import BytesIO
 from typing import Optional
 
 import qrcode
-from fastapi import HTTPException, UploadFile, status
+from fastapi import HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.config import ALLOWED_IMAGE_EXTENSIONS, UPLOAD_DIR
 from app.models.event import Event
+from app.models.gate_pass import GatePass
 from app.models.registration import EventRegistration
 from app.models.user import User
 from app.schemas.registration import RegistrationWithEvent
@@ -23,14 +24,36 @@ def _host_event_ids(user: User, db: Session) -> list[int]:
 
 
 def _get_registration(db: Session, reg_id: int) -> EventRegistration:
-    reg = db.query(EventRegistration).filter(EventRegistration.id == reg_id).first()
+    reg = (
+        db.query(EventRegistration)
+        .options(joinedload(EventRegistration.gate_pass))
+        .filter(EventRegistration.id == reg_id)
+        .first()
+    )
     if not reg:
         raise HTTPException(status_code=404, detail="Registration not found")
+    _attach_pass(reg)
+    return reg
+
+
+def _attach_pass(reg: EventRegistration) -> EventRegistration:
+    """Expose gate-pass columns as flat attrs so the API shape is unchanged.
+
+    Frontend expects reg.qr_code / reg.checked_in / ... directly on the
+    registration object. Those now live in gate_passes (Table 5/5).
+    """
+    gp = reg.gate_pass
+    reg.qr_code = gp.qr_code if gp else None  # type: ignore[attr-defined]
+    reg.checked_in = bool(gp.checked_in) if gp else False  # type: ignore[attr-defined]
+    reg.checked_in_at = gp.checked_in_at if gp else None  # type: ignore[attr-defined]
+    reg.checked_out = bool(gp.checked_out) if gp else False  # type: ignore[attr-defined]
+    reg.checked_out_at = gp.checked_out_at if gp else None  # type: ignore[attr-defined]
     return reg
 
 
 def _with_event(db: Session, reg: EventRegistration) -> RegistrationWithEvent:
     event = db.query(Event).filter(Event.id == reg.event_id).first()
+    _attach_pass(reg)
     item = RegistrationWithEvent.model_validate(reg)
     item.event = event
     return item
@@ -105,7 +128,7 @@ def register_for_event(
     db.add(reg)
     db.commit()
     db.refresh(reg)
-    return reg
+    return _attach_pass(reg)
 
 
 def list_registrations(
@@ -118,16 +141,15 @@ def list_registrations(
     - Hosts see registrations for their own events (filter with ?status=pending|accepted|rejected).
     - Visitors see their own registrations.
     """
+    query = db.query(EventRegistration).options(joinedload(EventRegistration.gate_pass))
     if current_user.role == "Host":
         event_ids = _host_event_ids(current_user, db)
-        query = db.query(EventRegistration).filter(EventRegistration.event_id.in_(event_ids))
+        query = query.filter(EventRegistration.event_id.in_(event_ids))
     elif current_user.role == "Visitor":
-        query = db.query(EventRegistration).filter(
+        query = query.filter(
             (EventRegistration.visitor_email == current_user.email)
             | (EventRegistration.visitor_id == current_user.id)
         )
-    else:
-        query = db.query(EventRegistration)
 
     if status_filter:
         query = query.filter(EventRegistration.status == status_filter)
@@ -157,21 +179,29 @@ def decide_registration(
 
     if decision == "accept":
         reg.status = "accepted"
-        if not reg.qr_code:
-            reg.qr_code = f"VGP-{secrets.token_urlsafe(16)}"
+        # Table 5/5: issue exactly one gate pass per accepted registration.
+        if not reg.gate_pass:
+            gp = GatePass(
+                registration_id=reg.id,
+                qr_code=f"VGP-{secrets.token_urlsafe(16)}",
+            )
+            db.add(gp)
+            db.flush()
+            reg.gate_pass = gp
     else:
         reg.status = "rejected"
 
     reg.decided_at = datetime.utcnow()
     db.commit()
     db.refresh(reg)
-    return reg
+    return _attach_pass(reg)
 
 
 def get_registration_qr(db: Session, current_user: User, reg_id: int) -> StreamingResponse:
     """Return the QR pass image (PNG) for an accepted registration."""
     reg = _get_registration(db, reg_id)
-    if reg.status != "accepted" or not reg.qr_code:
+    gp = reg.gate_pass
+    if reg.status != "accepted" or not gp:
         raise HTTPException(status_code=400, detail="QR pass is only available for accepted visitors")
 
     event = db.query(Event).filter(Event.id == reg.event_id).first()
@@ -186,7 +216,7 @@ def get_registration_qr(db: Session, current_user: User, reg_id: int) -> Streami
     ):
         raise HTTPException(status_code=403, detail="You can only view your own gate pass")
 
-    verify_url = f"http://127.0.0.1:8000/registrations/verify/{reg.qr_code}"
+    verify_url = f"http://127.0.0.1:8000/registrations/verify/{gp.qr_code}"
     png = _build_qr_png(verify_url)
     return StreamingResponse(
         BytesIO(png),
@@ -197,7 +227,15 @@ def get_registration_qr(db: Session, current_user: User, reg_id: int) -> Streami
 
 def verify_pass(db: Session, qr_code: str) -> RegistrationWithEvent:
     """Public verification of a gate pass QR code (used by gate checkers)."""
-    reg = db.query(EventRegistration).filter(EventRegistration.qr_code == qr_code).first()
+    gp = db.query(GatePass).filter(GatePass.qr_code == qr_code).first()
+    if not gp:
+        raise HTTPException(status_code=404, detail="Invalid or unknown gate pass")
+    reg = (
+        db.query(EventRegistration)
+        .options(joinedload(EventRegistration.gate_pass))
+        .filter(EventRegistration.id == gp.registration_id)
+        .first()
+    )
     if not reg:
         raise HTTPException(status_code=404, detail="Invalid or unknown gate pass")
     if reg.status != "accepted":
@@ -207,9 +245,9 @@ def verify_pass(db: Session, qr_code: str) -> RegistrationWithEvent:
 
 
 def checkin(db: Session, current_user: User, reg_id: int) -> EventRegistration:
-    """Mark an accepted visitor as checked in."""
+    """Mark an accepted visitor as checked in (updates gate_passes row)."""
     reg = _get_registration(db, reg_id)
-    if reg.status != "accepted":
+    if reg.status != "accepted" or not reg.gate_pass:
         raise HTTPException(status_code=400, detail="Only accepted visitors can check in")
 
     if current_user.role == "Host":
@@ -217,17 +255,17 @@ def checkin(db: Session, current_user: User, reg_id: int) -> EventRegistration:
         if not event or event.host_id != current_user.id:
             raise HTTPException(status_code=403, detail="This visitor belongs to another host's event")
 
-    reg.checked_in = True
-    reg.checked_in_at = datetime.utcnow()
+    reg.gate_pass.checked_in = True
+    reg.gate_pass.checked_in_at = datetime.utcnow()
     db.commit()
     db.refresh(reg)
-    return reg
+    return _attach_pass(reg)
 
 
 def checkout(db: Session, current_user: User, reg_id: int) -> EventRegistration:
-    """Mark an accepted visitor as checked out."""
+    """Mark an accepted visitor as checked out (updates gate_passes row)."""
     reg = _get_registration(db, reg_id)
-    if reg.status != "accepted":
+    if reg.status != "accepted" or not reg.gate_pass:
         raise HTTPException(status_code=400, detail="Only accepted visitors can check out")
 
     if current_user.role == "Host":
@@ -235,8 +273,8 @@ def checkout(db: Session, current_user: User, reg_id: int) -> EventRegistration:
         if not event or event.host_id != current_user.id:
             raise HTTPException(status_code=403, detail="This visitor belongs to another host's event")
 
-    reg.checked_out = True
-    reg.checked_out_at = datetime.utcnow()
+    reg.gate_pass.checked_out = True
+    reg.gate_pass.checked_out_at = datetime.utcnow()
     db.commit()
     db.refresh(reg)
-    return reg
+    return _attach_pass(reg)
