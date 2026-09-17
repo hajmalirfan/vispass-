@@ -19,6 +19,9 @@ import EventRegisterPage from './pages/visitor/EventRegisterPage';
 import CheckerDashboardLayout from './layouts/CheckerDashboardLayout';
 import QrScannerPage from './pages/checker/QrScannerPage';
 import TodaysEntriesPage from './pages/checker/TodaysEntriesPage';
+import AdminDashboardLayout from './layouts/AdminDashboardLayout';
+import AdminOverviewPage from './pages/admin/AdminOverviewPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
 
 function App() {
   return (
@@ -49,6 +52,10 @@ function App() {
           {/* Checker */}
           <Route path="/dashboard/checker" element={<CheckerDashboardLayout><QrScannerPage /></CheckerDashboardLayout>} />
           <Route path="/dashboard/checker/today" element={<CheckerDashboardLayout><TodaysEntriesPage /></CheckerDashboardLayout>} />
+
+          {/* Admin (OTP login only) */}
+          <Route path="/dashboard/admin" element={<AdminDashboardLayout><AdminOverviewPage /></AdminDashboardLayout>} />
+          <Route path="/dashboard/admin/users" element={<AdminDashboardLayout><AdminUsersPage /></AdminDashboardLayout>} />
         </Routes>
       </div>
     </Router>

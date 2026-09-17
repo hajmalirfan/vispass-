@@ -34,6 +34,7 @@ function extractToken(text: string): string | null {
 
 export const QrScannerPage: FC = () => {
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scanLockRef = useRef(false);
   const [scanState, setScanState] = useState<ScanState>('idle');
   const [cameraError, setCameraError] = useState('');
   const [manualToken, setManualToken] = useState('');
@@ -62,20 +63,40 @@ export const QrScannerPage: FC = () => {
 
   const startScanner = async () => {
     setCameraError('');
+    setError('');
+    setResult(null);
+    scanLockRef.current = false;
     setScanState('scanning');
     try {
       await stopScanner();
       scannerRef.current = new Html5Qrcode('qr-reader', { verbose: false });
       await scannerRef.current.start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 260, height: 260 } },
+        {
+          fps: 10,
+          // Responsive scan box — scales with the actual viewfinder size.
+          qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+            const edge = Math.max(
+              200,
+              Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75)
+            );
+            return { width: edge, height: edge };
+          },
+        },
         (decodedText) => {
+          // Scan once: lock, stop the camera, then verify.
+          if (scanLockRef.current) return;
           const token = extractToken(decodedText);
           if (!token) {
             setCameraError('Scanned code is not a valid gate pass');
             return;
           }
-          void verifyToken(token);
+          scanLockRef.current = true;
+          setCameraError('');
+          void (async () => {
+            await stopScanner();
+            await verifyToken(token);
+          })();
         },
         () => {
           // ignore per-frame decode errors
@@ -338,6 +359,14 @@ export const QrScannerPage: FC = () => {
                     {result.checked_out ? 'Exit Marked' : 'Mark Exit'}
                   </button>
                 </div>
+
+                <button
+                  onClick={startScanner}
+                  className="w-full mt-3 inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
+                >
+                  <ScanLine className="w-4 h-4" />
+                  Scan Another Pass
+                </button>
               </div>
             </motion.div>
           )}
@@ -354,6 +383,13 @@ export const QrScannerPage: FC = () => {
               {lastToken && (
                 <p className="mt-3 font-mono text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">{lastToken}</p>
               )}
+              <button
+                onClick={startScanner}
+                className="mt-5 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+              >
+                <ScanLine className="w-4 h-4" />
+                Scan Again
+              </button>
             </div>
           )}
 

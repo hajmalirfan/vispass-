@@ -3,12 +3,12 @@ from datetime import timedelta
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES, ADMIN_EMAIL
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.models.user import User
 from app.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
 
-VALID_ROLES = ("Visitor", "Host", "Checker")
+VALID_ROLES = ("Visitor", "Host", "Checker", "Admin")
 
 
 def register_user(db: Session, data: UserCreate) -> User:
@@ -23,7 +23,19 @@ def register_user(db: Session, data: UserCreate) -> User:
     if data.role not in VALID_ROLES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Role must be 'Visitor', 'Host', or 'Checker'",
+            detail="Role must be 'Visitor', 'Host', 'Checker' or 'Admin'",
+        )
+
+    # The admin email is reserved: only it may be Admin, and it may ONLY be Admin.
+    if data.role == "Admin" and data.email.lower().strip() != ADMIN_EMAIL:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the designated admin email can register as Admin",
+        )
+    if data.email.lower().strip() == ADMIN_EMAIL and data.role != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The admin email can only be registered as Admin",
         )
 
     user = User(
@@ -39,6 +51,11 @@ def register_user(db: Session, data: UserCreate) -> User:
 
 def login_user(db: Session, credentials: UserLogin) -> TokenResponse:
     """Authenticate a user and return a JWT access token."""
+    if credentials.role == "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Admins must sign in with email OTP via /admin/login-otp",
+        )
     db_user = db.query(User).filter(User.email == credentials.email).first()
 
     if not db_user or not verify_password(credentials.password, db_user.hashed_password):

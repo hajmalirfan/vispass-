@@ -2,13 +2,15 @@ import { useState } from 'react';
 import type { FC, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building2, Mail, Lock, Eye, EyeOff, UserPlus, Loader2, BadgeCheck } from 'lucide-react';
+import { User, Building2, Mail, Lock, Eye, EyeOff, UserPlus, Loader2, BadgeCheck, ShieldCheck, KeyRound } from 'lucide-react';
 
-type Role = 'Visitor' | 'Host' | 'Checker';
+type Role = 'Visitor' | 'Host' | 'Checker' | 'Admin';
+
+const ADMIN_EMAIL = 'kinghajmalirfan@gmail.com';
 
 export const LoginPage: FC = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState<Role>('Visitor');
+  const [role, setRole] = useState<Role | null>('Visitor');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,9 +18,34 @@ export const LoginPage: FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isFocused, setIsFocused] = useState<string | null>(null);
+  const [adminStep, setAdminStep] = useState<'credentials' | 'otp'>('credentials');
+  const [otp, setOtp] = useState('');
+
+  const selectRole = (value: Role) => {
+    // Clicking the selected role again un-selects it.
+    setRole((prev) => {
+      const next = prev === value ? null : value;
+      if (next === 'Admin') {
+        setEmail(ADMIN_EMAIL);
+        setAdminStep('credentials');
+        setOtp('');
+      }
+      return next;
+    });
+    setErrorMsg('');
+    setSuccessMsg('');
+  };
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+    if (!role) {
+      setErrorMsg('Please select a role (Visitor, Host, Checker or Admin) to continue.');
+      return;
+    }
+    if (role === 'Admin') {
+      await handleAdminSendOtp(e);
+      return;
+    }
     setIsSigningIn(true);
     setErrorMsg('');
     setSuccessMsg('');
@@ -61,10 +88,65 @@ export const LoginPage: FC = () => {
     }
   };
 
+  const handleAdminSendOtp = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSigningIn(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      const response = await fetch('http://localhost:8000/admin/login-otp/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || 'Could not send OTP.');
+      }
+      setSuccessMsg('4-digit OTP sent to the admin email. Enter it below.');
+      setAdminStep('otp');
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  const handleAdminVerifyOtp = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{4}$/.test(otp.trim())) {
+      setErrorMsg('OTP must be exactly 4 digits.');
+      return;
+    }
+    setIsSigningIn(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      const response = await fetch('http://localhost:8000/admin/login-otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: otp.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || 'OTP verification failed.');
+      }
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setSuccessMsg('Welcome back, Admin! Opening dashboard...');
+      setTimeout(() => navigate('/dashboard/admin'), 800);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'An unexpected error occurred.');
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
   const roles: { value: Role; label: string; icon: any; color: string; desc: string }[] = [
     { value: 'Visitor', label: 'Visitor', icon: User, color: 'text-blue-600', desc: 'Access & pass requests' },
     { value: 'Host', label: 'Host', icon: Building2, color: 'text-blue-600', desc: 'Manage visitors & passes' },
     { value: 'Checker', label: 'Checker', icon: BadgeCheck, color: 'text-blue-600', desc: 'Verify at gate points' },
+    { value: 'Admin', label: 'Admin', icon: ShieldCheck, color: 'text-blue-600', desc: 'Full control via email OTP' },
   ];
 
   const selectedRole = roles.find(r => r.value === role);
@@ -128,11 +210,11 @@ export const LoginPage: FC = () => {
             </motion.div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={role === 'Admin' ? (adminStep === 'otp' ? handleAdminVerifyOtp : handleAdminSendOtp) : handleLogin} className="space-y-5">
             {/* Role Selection */}
             <div className="space-y-3">
               <label className="text-sm font-semibold text-gray-700">Login As</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {roles.map((r) => {
                   const isSelected = role === r.value;
                   const Icon = r.icon;
@@ -140,7 +222,7 @@ export const LoginPage: FC = () => {
                     <button
                       key={r.value}
                       type="button"
-                      onClick={() => setRole(r.value)}
+                      onClick={() => selectRole(r.value)}
                       className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border transition-all duration-200 group ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
@@ -153,18 +235,23 @@ export const LoginPage: FC = () => {
                   );
                 })}
               </div>
-              {selectedRole && (
+              {selectedRole ? (
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="text-xs text-gray-400 text-center font-medium"
                 >
-                  {selectedRole.desc}
+                  {selectedRole.desc} — tap again to un-select
                 </motion.p>
+              ) : (
+                <p className="text-xs text-amber-600 text-center font-semibold">
+                  No role selected — pick one above to continue
+                </p>
               )}
             </div>
 
-            {/* Email */}
+            {/* Email (hidden for Admin — fixed server-side, never displayed) */}
+            {role !== 'Admin' && (
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-gray-700">Email Address</label>
               <div className={`relative rounded-xl border transition-all duration-200 bg-white ${
@@ -185,8 +272,17 @@ export const LoginPage: FC = () => {
                 />
               </div>
             </div>
+            )}
 
-            {/* Password */}
+            {/* Admin OTP notice */}
+            {role === 'Admin' && adminStep === 'credentials' && (
+              <div className="p-3 bg-blue-50 border border-blue-100 text-blue-700 rounded-xl text-xs font-medium text-center">
+                Admin sign-in is passwordless — click Send OTP and enter the 4-digit code mailed to you.
+              </div>
+            )}
+
+            {/* Password (password login is not used for Admin) */}
+            {role !== 'Admin' && (
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-gray-700">Password</label>
               <div className={`relative rounded-xl border transition-all duration-200 bg-white ${
@@ -215,8 +311,46 @@ export const LoginPage: FC = () => {
                 </button>
               </div>
             </div>
+            )}
+
+            {/* Admin OTP entry */}
+            {role === 'Admin' && adminStep === 'otp' && (
+            <div className="space-y-1.5">
+              <label className="text-sm font-semibold text-gray-700">4-digit OTP</label>
+              <div className="relative rounded-xl border border-gray-200 bg-white hover:border-gray-300 transition-all duration-200">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <KeyRound className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  inputMode="numeric"
+                  maxLength={4}
+                  placeholder="••••"
+                  className="w-full pl-10 pr-4 py-3 bg-transparent focus:outline-none text-center text-xl tracking-[0.5em] font-bold text-gray-900 placeholder:text-gray-300"
+                />
+              </div>
+              <div className="flex items-center justify-between text-sm pt-1">
+                <button
+                  type="button"
+                  onClick={() => { setAdminStep('credentials'); setOtp(''); setErrorMsg(''); setSuccessMsg(''); }}
+                  className="text-gray-500 hover:text-gray-800 font-semibold text-sm transition-colors"
+                >
+                  ← Change email
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAdminSendOtp}
+                  className="text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors"
+                >
+                  Resend OTP
+                </button>
+              </div>
+            </div>
+            )}
 
             {/* Remember & Forgot */}
+            {role !== 'Admin' && (
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 transition-colors cursor-pointer" />
@@ -230,6 +364,7 @@ export const LoginPage: FC = () => {
                 Forgot password?
               </button>
             </div>
+            )}
 
             {/* Login Button */}
             <motion.button
@@ -242,10 +377,10 @@ export const LoginPage: FC = () => {
               {isSigningIn ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Signing in...</span>
+                  <span>{role === 'Admin' ? (adminStep === 'otp' ? 'Verifying...' : 'Sending OTP...') : 'Signing in...'}</span>
                 </>
               ) : (
-                <span>Sign In</span>
+                <span>{role === 'Admin' ? (adminStep === 'otp' ? 'Verify OTP & Sign In' : 'Send OTP') : 'Sign In'}</span>
               )}
             </motion.button>
           </form>

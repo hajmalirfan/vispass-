@@ -216,7 +216,7 @@ def get_registration_qr(db: Session, current_user: User, reg_id: int) -> Streami
     ):
         raise HTTPException(status_code=403, detail="You can only view your own gate pass")
 
-    verify_url = f"http://127.0.0.1:8000/registrations/verify/{gp.qr_code}"
+    verify_url = f"http://127.0.0.1:8000/api/registrations/verify/{gp.qr_code}"
     png = _build_qr_png(verify_url)
     return StreamingResponse(
         BytesIO(png),

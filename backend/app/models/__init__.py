@@ -4,5 +4,6 @@ from app.models.profile import VisitorProfile
 from app.models.registration import EventRegistration
 from app.models.user import User
 from app.models.password_reset import PasswordResetOTP
+from app.models.login_otp import LoginOTP
 
-__all__ = ["User", "Event", "EventRegistration", "VisitorProfile", "GatePass", "PasswordResetOTP"]
+__all__ = ["User", "Event", "EventRegistration", "VisitorProfile", "GatePass", "PasswordResetOTP", "LoginOTP"]

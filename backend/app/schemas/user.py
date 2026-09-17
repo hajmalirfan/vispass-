@@ -41,3 +41,12 @@ class ResetPasswordRequest(BaseModel):
     email: EmailStr
     otp: str
     new_password: str
+
+
+class AdminLoginOTPRequest(BaseModel):
+    email: EmailStr
+
+
+class AdminVerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str

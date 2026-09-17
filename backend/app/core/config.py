@@ -19,3 +19,6 @@ MAILTRAP_API_TOKEN = os.getenv("MAILTRAP_API_TOKEN", "")
 MAILTRAP_SENDER_EMAIL = os.getenv("MAILTRAP_SENDER_EMAIL", "hello@demomailtrap.co")
 MAILTRAP_SENDER_NAME = os.getenv("MAILTRAP_SENDER_NAME", "VisPass Support")
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
+
+# Admin access — only this email can hold the Admin role (OTP login only).
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "kinghajmalirfan@gmail.com").lower()

@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.api import checker, events, profile, registrations, reports, users
+from app.api import admin, checker, events, profile, registrations, reports, users
 from app.core.config import UPLOAD_DIR
 from app.database.core import engine, Base
 # Import models so all 5 tables are registered on Base before create_all.
@@ -32,6 +32,7 @@ app.add_middleware(
 )
 
 app.include_router(users.router, prefix="/users", tags=["users"])
+app.include_router(admin.router, prefix="/admin", tags=["admin"])
 app.include_router(events.router, prefix="/events", tags=["events"])
 app.include_router(registrations.router, prefix="/api", tags=["registrations"])
 app.include_router(reports.router, prefix="/reports", tags=["reports"])
