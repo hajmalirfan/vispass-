@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegistrationPage from './pages/RegistrationPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import HostDashboardLayout from './layouts/HostDashboardLayout';
 import MyEventsPage from './pages/host/MyEventsPage';
 import CreateEventPage from './pages/host/CreateEventPage';
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegistrationPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
           {/* Host Dashboard */}
           <Route path="/dashboard/host" element={<HostDashboardLayout><MyEventsPage /></HostDashboardLayout>} />

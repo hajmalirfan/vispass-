@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FC, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building2, Mail, Lock, Eye, EyeOff, Shield, UserPlus, Loader2, BadgeCheck } from 'lucide-react';
+import { User, Building2, Mail, Lock, Eye, EyeOff, UserPlus, Loader2, BadgeCheck } from 'lucide-react';
 
 type Role = 'Visitor' | 'Host' | 'Checker';
 
@@ -85,12 +85,7 @@ export const LoginPage: FC = () => {
         className="text-center mb-8 z-10"
       >
         <div className="flex justify-center mb-4">
-          <div className="relative">
-            <div className="absolute inset-0 bg-blue-600/20 rounded-2xl rotate-6"></div>
-            <div className="relative bg-white p-3 rounded-2xl shadow-lg border border-gray-100">
-              <Shield className="text-blue-600 w-8 h-8" />
-            </div>
-          </div>
+          <img src="/vispass-logo.png" alt="VisPass logo" className="w-16 h-16 rounded-2xl object-contain bg-white shadow-lg border border-gray-100" />
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
           Visitor Gate Pass
@@ -227,9 +222,13 @@ export const LoginPage: FC = () => {
                 <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 transition-colors cursor-pointer" />
                 <span className="text-gray-600 group-hover:text-gray-800 transition-colors font-medium text-sm">Remember me</span>
               </label>
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors">
+              <button
+                type="button"
+                onClick={() => navigate('/forgot-password')}
+                className="text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors"
+              >
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             {/* Login Button */}

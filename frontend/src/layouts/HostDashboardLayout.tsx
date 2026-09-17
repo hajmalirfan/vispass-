@@ -10,7 +10,6 @@ import {
   XCircle,
   ClipboardList,
   BarChart3,
-  Shield,
   LogOut,
   Menu,
   X,
@@ -46,12 +45,7 @@ export const HostDashboardLayout: FC<{ children: ReactNode }> = ({ children }) =
   const sidebar = (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-        <div className="relative">
-          <div className="absolute inset-0 bg-blue-600/20 rounded-xl rotate-3"></div>
-          <div className="relative bg-blue-600 p-2 rounded-xl shadow-md">
-            <Shield className="text-white w-5 h-5" />
-          </div>
-        </div>
+        <img src="/vispass-logo.png" alt="VisPass logo" className="w-9 h-9 rounded-xl object-contain bg-white border border-gray-100 shadow-md" />
         <div>
           <p className="text-sm font-bold text-gray-900 leading-tight">Visitor Gate Pass</p>
           <p className="text-[11px] text-gray-400 font-medium">Host Dashboard</p>
@@ -135,9 +129,7 @@ export const HostDashboardLayout: FC<{ children: ReactNode }> = ({ children }) =
       <div className="flex-1 lg:ml-64 min-w-0">
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-gray-100 lg:hidden flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="bg-blue-600 p-1.5 rounded-lg">
-              <Shield className="text-white w-4 h-4" />
-            </div>
+            <img src="/vispass-logo.png" alt="VisPass logo" className="w-7 h-7 rounded-lg object-contain bg-white border border-gray-100" />
             <span className="text-sm font-bold text-gray-900">Host Dashboard</span>
           </div>
           <button

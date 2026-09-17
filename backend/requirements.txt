@@ -12,3 +12,4 @@ python-dotenv>=1.0.0
 python-jose[cryptography]>=3.3.0
 qrcode[pil]>=7.0
 pillow>=10.0
+mailtrap>=2.0.0

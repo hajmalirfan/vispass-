@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @layer base {
@@ -8,12 +9,19 @@
     --color-danger: 239 68 68; /* #EF4444 */
     --color-text: 31 41 55; /* #1F2937 */
     --color-background: 255 255 255; /* #FFFFFF */
+    --default-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  html,
+  body,
+  #root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   body {
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-text));
-    font-family: 'Inter', 'Poppins', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 

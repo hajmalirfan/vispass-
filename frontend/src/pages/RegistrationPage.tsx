@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FC, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Building, Mail, Lock, Eye, EyeOff, Shield, Loader2, ArrowLeft, CheckSquare } from 'lucide-react';
+import { User, Building, Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, CheckSquare } from 'lucide-react';
 
 type Role = 'Visitor' | 'Host' | 'Checker';
 
@@ -66,9 +66,7 @@ export const RegistrationPage: FC = () => {
         className="text-center mb-8 z-10"
       >
         <div className="flex justify-center mb-4">
-          <div className="bg-blue-600 p-3 rounded-2xl shadow-lg">
-            <Shield className="text-white w-8 h-8" />
-          </div>
+          <img src="/vispass-logo.png" alt="VisPass logo" className="w-16 h-16 rounded-2xl object-contain bg-white shadow-lg border border-gray-100" />
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">
           Create New User
