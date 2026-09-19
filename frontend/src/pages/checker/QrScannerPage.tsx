@@ -143,7 +143,8 @@ export const QrScannerPage: FC = () => {
     setBusy(action);
     setError('');
     try {
-      const updated = await api<Registration>(`/api/registrations/${result.id}/${action}`, { method: 'PUT' });
+      const endpoint = action === 'entry' ? 'checkin' : 'checkout';
+      const updated = await api<Registration>(`/api/registrations/${result.id}/${endpoint}`, { method: 'PUT' });
       setResult(updated);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : `Failed to mark ${action}`);

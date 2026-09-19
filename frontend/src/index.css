@@ -83,6 +83,22 @@
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-text));
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+.brand-logo {
+  display: block;
+  width: 9rem;
+  height: 3.25rem;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 639px) {
+  .brand-logo {
+    width: 7rem;
+    height: 2.75rem;
   }
 }
 

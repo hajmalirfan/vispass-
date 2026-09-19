@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { FC } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Printer, QrCode as QrIcon, Shield, CalendarDays, User as UserIcon, Hash } from 'lucide-react';
+import { Download, Printer, QrCode as QrIcon, CalendarDays, User as UserIcon, Hash } from 'lucide-react';
 import { api, apiBlob, apiObjectUrl } from '../../services/api';
 import type { Registration } from '../../services/types';
 import { PageHeader, LoadingState, ErrorBanner, EmptyState, StatusBadge, formatDate } from '../../components/ui';
@@ -107,9 +107,7 @@ export const QrPassPage: FC = () => {
               <div className="p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-2 rounded-xl">
-                      <Shield className="text-white w-6 h-6" />
-                    </div>
+                    <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo w-32 h-12 shrink-0" />
                     <div>
                       <p className="font-bold text-gray-900 leading-tight">Visitor Gate Pass</p>
                       <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wider">

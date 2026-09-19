@@ -66,7 +66,7 @@ export const RegistrationPage: FC = () => {
         className="text-center mb-8 z-10"
       >
         <div className="flex justify-center mb-4">
-          <img src="/vispass-logo.png" alt="VisPass logo" className="w-16 h-16 rounded-2xl object-contain bg-white shadow-lg border border-gray-100" />
+          <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo w-48 h-28" />
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">
           Create New User
@@ -81,7 +81,7 @@ export const RegistrationPage: FC = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="w-full max-w-[460px] glass-card rounded-[20px] p-8 md:p-10 z-10 relative"
+        className="w-full max-w-[460px] glass-card rounded-[20px] p-5 sm:p-8 md:p-10 z-10 relative"
       >
         <button 
           onClick={() => navigate('/')}
@@ -111,7 +111,7 @@ export const RegistrationPage: FC = () => {
           {/* Role Selection */}
           <div className="space-y-3">
             <label className="text-sm font-semibold text-gray-700">Account Type</label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setRole('Visitor')}

@@ -29,7 +29,7 @@ export const CheckerDashboardLayout: FC<{ children: ReactNode }> = ({ children }
   const sidebar = (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-        <img src="/vispass-logo.png" alt="VisPass logo" className="w-9 h-9 rounded-xl object-contain bg-white border border-gray-100 shadow-md" />
+        <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo shrink-0" />
         <div>
           <p className="text-sm font-bold text-gray-900 leading-tight">Visitor Gate Pass</p>
           <p className="text-[11px] text-gray-400 font-medium">Checker Dashboard</p>
@@ -94,7 +94,7 @@ export const CheckerDashboardLayout: FC<{ children: ReactNode }> = ({ children }
             initial={{ x: -280 }}
             animate={{ x: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="absolute inset-y-0 left-0 w-72 bg-white shadow-2xl"
+            className="absolute inset-y-0 left-0 w-[min(18rem,calc(100vw-1rem))] bg-white shadow-2xl"
           >
             <button
               onClick={() => setMobileOpen(false)}
@@ -110,7 +110,7 @@ export const CheckerDashboardLayout: FC<{ children: ReactNode }> = ({ children }
       <div className="flex-1 lg:ml-64 min-w-0">
         <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-gray-100 lg:hidden flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <img src="/vispass-logo.png" alt="VisPass logo" className="w-7 h-7 rounded-lg object-contain bg-white border border-gray-100" />
+            <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo w-24 h-10 shrink-0" />
             <span className="text-sm font-bold text-gray-900">Checker Dashboard</span>
           </div>
           <button
@@ -121,7 +121,7 @@ export const CheckerDashboardLayout: FC<{ children: ReactNode }> = ({ children }
           </button>
         </header>
 
-        <main className="p-4 md:p-8">{children}</main>
+        <main className="p-3 sm:p-4 md:p-8">{children}</main>
       </div>
     </div>
   );

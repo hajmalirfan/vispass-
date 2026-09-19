@@ -87,14 +87,14 @@ export const ForgotPasswordPage: FC = () => {
 
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8 z-10">
         <div className="flex justify-center mb-4">
-          <img src="/vispass-logo.png" alt="VisPass logo" className="w-16 h-16 rounded-2xl object-contain bg-white shadow-lg border border-gray-100" />
+          <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo w-48 h-28" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900">Forgot Password</h1>
         <p className="text-sm text-gray-500 mt-1">Works for Visitor, Host &amp; Checker accounts</p>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[420px] z-10">
-        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xl p-8">
+        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xl p-5 sm:p-8">
           <div className="flex items-center gap-2 mb-6 text-xs font-semibold text-gray-500">
             {(['email', 'otp', 'reset'] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center gap-2">

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FC, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CalendarDays, MapPin, Users, Loader2, UserPlus, Shield, FileUp, FileText, X } from 'lucide-react';
+import { ArrowLeft, CalendarDays, MapPin, Users, Loader2, UserPlus, FileUp, FileText, X } from 'lucide-react';
 import { api, getUser } from '../../services/api';
 import type { Event } from '../../services/types';
 import { LoadingState, ErrorBanner, SuccessBanner, formatDate } from '../../components/ui';
@@ -73,13 +73,10 @@ export const EventRegisterPage: FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-3">
-        <div className="bg-blue-600 p-2 rounded-xl">
-          <Shield className="text-white w-5 h-5" />
-        </div>
+      <header className="bg-white border-b border-gray-100 px-3 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sm:gap-3">
+        <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo w-28 sm:w-36 h-10 sm:h-12 shrink-0" />
         <div>
-          <p className="text-sm font-bold text-gray-900 leading-tight">Visitor Gate Pass</p>
-          <p className="text-[11px] text-gray-400 font-medium">Event Application</p>
+          <p className="text-sm font-bold text-gray-900 leading-tight hidden sm:block">Event Application</p>
         </div>
         <button
           onClick={() => navigate('/dashboard/visitor')}
@@ -90,7 +87,7 @@ export const EventRegisterPage: FC = () => {
         </button>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 flex justify-center">
+      <main className="flex-1 p-3 sm:p-4 md:p-8 flex justify-center">
         {loading ? (
           <LoadingState label="Loading event..." />
         ) : !event ? (
@@ -105,7 +102,7 @@ export const EventRegisterPage: FC = () => {
               className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
             >
               <div className="h-1.5 bg-gradient-to-r from-blue-500 to-sky-400" />
-              <div className="p-6 md:p-8">
+              <div className="p-4 sm:p-6 md:p-8">
                 <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
                 {event.description && <p className="text-sm text-gray-500 mt-2">{event.description}</p>}
                 <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm text-gray-500">
@@ -129,7 +126,7 @@ export const EventRegisterPage: FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8"
+              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 md:p-8"
             >
               <h2 className="text-lg font-bold text-gray-900 mb-1">Apply for this event</h2>
               <p className="text-sm text-gray-500 mb-6">Your application will be sent to the host for approval.</p>

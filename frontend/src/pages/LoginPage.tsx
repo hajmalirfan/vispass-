@@ -167,7 +167,7 @@ export const LoginPage: FC = () => {
         className="text-center mb-8 z-10"
       >
         <div className="flex justify-center mb-4">
-          <img src="/vispass-logo.png" alt="VisPass logo" className="w-16 h-16 rounded-2xl object-contain bg-white shadow-lg border border-gray-100" />
+          <img src="/vispass-logo.png" alt="VisPass logo" className="brand-logo w-48 h-28" />
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
           Visitor Gate Pass
@@ -184,7 +184,7 @@ export const LoginPage: FC = () => {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="w-full max-w-[420px] z-10"
       >
-        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xl shadow-gray-200/50 p-8 md:p-10">
+        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xl shadow-gray-200/50 p-5 sm:p-8 md:p-10">
           <div className="text-center mb-8">
             <h2 className="text-xl font-bold text-gray-900">Welcome back</h2>
             <p className="text-sm text-gray-500 mt-1">Sign in to your account</p>
