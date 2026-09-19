@@ -407,7 +407,10 @@ export const LoginPage: FC = () => {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="mt-12 text-center text-xs text-gray-400 z-10 font-medium"
       >
-        <p> Visitor Entry & Gate Pass Management System</p>
+        <p>Visitor Entry &amp; Gate Pass Management System</p>
+        <button type="button" onClick={() => navigate('/privacy-policy')} className="mt-2 text-blue-600 hover:text-blue-700 transition-colors">
+          Privacy Policy
+        </button>
       </motion.div>
     </div>
   );
