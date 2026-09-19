@@ -22,3 +22,12 @@ OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 
 # Admin access — only this email can hold the Admin role (OTP login only).
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "kinghajmalirfan@gmail.com").lower()
+
+CORS_ORIGINS = [
+	origin.strip()
+	for origin in os.getenv(
+		"CORS_ORIGINS",
+		"http://localhost:5173,http://127.0.0.1:5173,https://vispass-frontend.onrender.com",
+	).split(",")
+	if origin.strip()
+]
