@@ -3,6 +3,7 @@ import type { FC, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Building2, Mail, Lock, Eye, EyeOff, UserPlus, Loader2, BadgeCheck, ShieldCheck, KeyRound } from 'lucide-react';
+import API_URL from '../services/api';
 
 type Role = 'Visitor' | 'Host' | 'Checker' | 'Admin';
 
@@ -51,7 +52,7 @@ export const LoginPage: FC = () => {
     setSuccessMsg('');
 
     try {
-      const response = await fetch('http://localhost:8000/users/login', {
+      const response = await fetch(`${API_URL}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,7 @@ export const LoginPage: FC = () => {
     setErrorMsg('');
     setSuccessMsg('');
     try {
-      const response = await fetch('http://localhost:8000/admin/login-otp/request', {
+      const response = await fetch(`${API_URL}/admin/login-otp/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -122,7 +123,7 @@ export const LoginPage: FC = () => {
     setErrorMsg('');
     setSuccessMsg('');
     try {
-      const response = await fetch('http://localhost:8000/admin/login-otp/verify', {
+      const response = await fetch(`${API_URL}/admin/login-otp/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: otp.trim() }),

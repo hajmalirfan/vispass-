@@ -3,6 +3,7 @@ import type { FC, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Building, Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, CheckSquare } from 'lucide-react';
+import API_URL from '../services/api';
 
 type Role = 'Visitor' | 'Host' | 'Checker';
 
@@ -23,7 +24,7 @@ export const RegistrationPage: FC = () => {
     setSuccessMsg('');
 
     try {
-      const response = await fetch('http://localhost:8000/users/register', {
+      const response = await fetch(`${API_URL}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
