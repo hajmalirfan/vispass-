@@ -367,6 +367,21 @@ Main Tables
 
 ---
 
+# Render Frontend Deployment
+
+The frontend uses `BrowserRouter`, so Render must rewrite every client-side route to `index.html` before React handles the URL. The repository includes `render.yaml` with this rewrite configured.
+
+If the Render service was created manually, set these values in the frontend Static Site settings:
+
+* **Root Directory:** `frontend`
+* **Build Command:** `npm ci && npm run build`
+* **Publish Directory:** `dist`
+* **Rewrite Rule:** Source `/*`, Destination `/index.html`
+
+After saving the rule, trigger a new deployment. Refreshing routes such as `/dashboard/visitor` will then load the React application correctly.
+
+---
+
 # License
 
 This project is licensed under the **MIT License**.
